@@ -1,5 +1,5 @@
-***Currently rewriting this shit from the ground up...im coming back and fuck Rai***
-
+Readme to be written
+<!-- 
 # raiplay-dl
 
 raiplay-dl - the most advanced raiplay.it downloader
@@ -138,4 +138,4 @@ Downloading "Don Matteo - 09x03 - Testimone d'accusa (2014) [414p]"
 
 If you appreciate my work and if you can afford it, it would be great if you could give me a small donation!
 
-[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/wetcork)
+[!["Buy Me A Coffee"](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/wetcork) -->
