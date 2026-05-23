@@ -1,22 +1,28 @@
 name: Build executables
 
-on: [push]
+on:
+  push:
+    tags:
+      - "v*"
 
 defaults:
   run:
     shell: bash
 
 jobs:
-  Build:
-    name: Build release binaries
+  build:
+    name: Build ${{ matrix.folder }}
 
     strategy:
       fail-fast: false
       matrix:
-        os:
-          - macos-latest
-          - ubuntu-latest
-          - windows-latest
+        include:
+          - os: macos-latest
+            folder: macos
+          - os: ubuntu-latest
+            folder: linux
+          - os: windows-latest
+            folder: windows
 
     runs-on: ${{ matrix.os }}
 
@@ -28,12 +34,40 @@ jobs:
         uses: astral-sh/setup-uv@v5
 
       - name: Install dependencies
-        run: uv sync
+        run: uv sync --group build
 
-      - name: Build with pyinstaller
-        run: uv run pyinstaller --onefile --name=raiplay-${{ matrix.os }} src/main.py
+      - name: Build
+        run: uv run pyinstaller --onefile --name=raiplay-dl --distpath=dist src/main.py
 
-      - name: Commit and push to the repository
-        uses: stefanzweifel/git-auto-commit-action@v5
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
-          commit_message: New release of raiplay-${{ matrix.os }}
+          name: raiplay-dl-${{ matrix.folder }}
+          path: dist/raiplay-dl*
+
+  release:
+    name: Create release
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Zip binaries
+        run: |
+          cd artifacts/raiplay-dl-macos && zip raiplay-dl-macos.zip raiplay-dl && cd ../..
+          cd artifacts/raiplay-dl-linux && zip raiplay-dl-linux.zip raiplay-dl && cd ../..
+          cd artifacts/raiplay-dl-windows && zip raiplay-dl-windows.zip raiplay-dl.exe && cd ../..
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            artifacts/raiplay-dl-macos/raiplay-dl-macos.zip
+            artifacts/raiplay-dl-linux/raiplay-dl-linux.zip
+            artifacts/raiplay-dl-windows/raiplay-dl-windows.zip
